@@ -1,4 +1,6 @@
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, render_template
+
+# will need to import jsonify, request and maybe joinedload later
 
 main_bp = Blueprint("main", __name__)
 

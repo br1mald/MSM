@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Marketplace de Services Ménagers</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+        <script
+            defer
+            src=" {{ url_for('static', filename='script.js') }}"
+        ></script>
+    </head>
+    <body>
+        {% block body %} {% endblock %}
+    </body>
+</html>
