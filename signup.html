@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1>Inscrivez-vous !</h1>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="username">Identifiant</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="number">Numéro de Téléphone</label>
+                    <div class="phone-input-group">
+                        <span class="country-code">+221</span>
+                        <input type="tel" id="number" name="number" placeholder="77 123 45 67" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de Passe</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmez le Mot de Passe</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <button type="submit" class="btn">Inscription</button>
+            </form>
+            <p class="toggle-text">
+                Vous avez déjà un compte ?<a href="signin.html">Connectez-vous ici.</a>
+            </p>
+        </div>
+    </div>
+    <script src="scripts.js" defer></script>
+</body>
+</html>

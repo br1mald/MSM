@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1>Connectez-vous !</h1>
+            <form id="signinForm">
+                <div class="form-group">
+                    <label for="emailOrPhone">Email ou Numéro de Téléphone</label>
+                    <input type="text" id="emailOrPhone" name="emailOrPhone" placeholder="exemple@email.com ou 77 123 45 67" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de Passe</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn">Connexion</button>
+            </form>
+            <p class="toggle-text">
+                Vous n'avez pas de compte ? <a href="signup.html">Inscrivez-vous ici.</a>
+            </p>
+        </div>
+    </div>
+    <script src="scripts.js" defer></script>
+</body>
+</html>
