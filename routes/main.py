@@ -10,6 +10,16 @@ def index():
     return render_template("index.html")
 
 
-@main_bp.route("/profile")
-def profile():
-    return render_template("profile.html")
+@main_bp.route("/search")
+def search():
+    return render_template("search.html")
+
+
+@main_bp.route("/log-in")
+def log_in():
+    return render_template("signin.html")
+
+
+@main_bp.route("/sign-up")
+def sign_up():
+    return render_template("signup.html")
