@@ -40,10 +40,10 @@ class User(db.Model):
     email_address: Mapped[str] = mapped_column(unique=True)
     # will add authentication later
 
-    worker_profile: Mapped["Worker"] | None = relationship(
+    worker_profile: Mapped["Worker | None"] = relationship(
         back_populates="user", uselist=False
     )
-    employer_profile: Mapped["Employer"] = relationship(
+    employer_profile: Mapped["Employer | None"] = relationship(
         back_populates="user", uselist=False
     )
 
@@ -55,7 +55,7 @@ class Worker(db.Model):
     user_id: Mapped[int] = mapped_column(db.ForeignKey("users.id"), unique=True)
     desired_salary: Mapped[int]
     preferred_schedule: Mapped[Schedule] = mapped_column(Enum(Schedule))
-    ratings: Mapped[float | None] = mapped_column(nullable=True)
+    ratings: Mapped[list[float] | None] = mapped_column(nullable=True)
 
     user: Mapped[User] = relationship(back_populates="worker_profile")
     employments: Mapped[list["Employment"]] = relationship(back_populates="worker")
@@ -72,7 +72,7 @@ class Employer(db.Model):
     cleaning_frequency: Mapped[CleaningFrequency] = mapped_column(
         Enum(CleaningFrequency)
     )
-    ratings: Mapped[float | None] = mapped_column(nullable=True)
+    ratings: Mapped[list[float] | None] = mapped_column(nullable=True)
 
     user: Mapped[User] = relationship(back_populates="employer_profile")
     employments: Mapped[list["Employment"]] = relationship(back_populates="employer")
