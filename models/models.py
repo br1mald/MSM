@@ -8,6 +8,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 db = SQLAlchemy()
 
 
+class PostType(PyEnum):
+    JOBSEARCH = "jobsearch"
+    JOBOFFER = "joboffer"
+
+
 class EmploymentStatus(PyEnum):
     PENDING = "pending"
     ACTIVE = "active"
@@ -46,6 +51,7 @@ class User(db.Model):
     employer_profile: Mapped["Employer | None"] = relationship(
         back_populates="user", uselist=False
     )
+    posts: Mapped[list["Post | None"]] = relationship(back_populates="author")
 
 
 class Worker(db.Model):
@@ -94,3 +100,13 @@ class Employment(db.Model):
 
     worker: Mapped["Worker"] = relationship(back_populates="employments")
     employer: Mapped["Employer"] = relationship(back_populates="employments")
+
+
+class Post(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(default=datetime.now)
+    type: Mapped[PostType] = mapped_column(Enum(PostType))
+    title: Mapped[str]
+    description: Mapped[str]
+
+    author: Mapped["User"] = relationship(back_populates="posts")
