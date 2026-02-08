@@ -3,11 +3,13 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from models import Employer, User, Worker, db
+from utils import login_required
 
 user_bp = Blueprint("user", __name__)
 
 
 @user_bp.route("/profile")
+@login_required
 def profile():
     user_id = session.get("user_id")
     if not user_id:
