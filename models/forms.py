@@ -9,7 +9,7 @@ class WorkerSearchForm(FlaskForm):
     dispo = SelectField(
         "Disponibilité",
         choices=[
-            ("", "Toute disponibilé"),
+            ("", "Toute disponibilité"),
             ("FLEXIBLE", "Flexible"),
             # ("Temps plein", "Temps plein"),
             ("MORNINGS", "Matin"),
