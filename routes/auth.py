@@ -50,12 +50,19 @@ def register():
             flash("Cet email est déjà utilisé.")
             return redirect(url_for("auth.register"))
 
+        stmt = select(User).filter_by(phone_number=phone_number)
+        existing_phone_number = db.session.execute(stmt).scalars().first()
+        if existing_phone_number:
+            flash("Ce numéro de téléphone est déjà utilisé.")
+            return redirect(url_for("auth.register"))
+
         user = User(
             first_name=first_name,
             last_name=last_name,
             email_address=email,
             phone_number=phone_number,
         )
+
         user.set_password(password)
         db.session.add(user)
         db.session.flush()
