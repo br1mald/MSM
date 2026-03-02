@@ -14,6 +14,9 @@
                 </div>
             </div>
         </div>
+        <p style="margin: 0.8rem 0; font-size: 0.9rem; color: var(--gray)">
+            {{ worker.description[:100] if worker.description else '' }}...
+        </p>
         <div class="tags">
             {% for competence in worker.competences %}
             <span class="tag">{{ competence }}</span>
