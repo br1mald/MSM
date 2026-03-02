@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block main %}
+<div class="form-container" style="max-width: 620px">
+    <div class="form-title">Compléter mon profil</div>
+    <p class="form-sub">Ces informations seront vérifiées par notre équipe</p>
+    <div class="alert alert-info">📎 Remplissez les informations ci-dessous</div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'success' if category == 'success' else 'error' }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        {% if role == "worker" %}
+        <div class="form-group">
+            <label>Salaire souhaité (F CFA / mois)</label>
+            <input type="number" name="desired_salary" min="0" step="5000" placeholder="Ex: 150000" value="{{ user.worker_profile.desired_salary if user.worker_profile else '' }}"/>
+        </div>
+        <div class="form-group">
+            <label>Compétences (séparées par des virgules)</label>
+            <input type="text" name="competences" placeholder="Nettoyage, Garde d'enfant, Repassage, Cuisine..." value="{% if user.worker_profile and user.worker_profile.competences %}{{ user.worker_profile.competences | join(', ') }}{% endif %}"/>
+        </div>
+        <div class="form-group">
+            <label>Disponibilité</label>
+            <select name="schedule">
+                <option value="flexible" {% if user.worker_profile and user.worker_profile.preferred_schedule.value == 'flexible' %}selected{% endif %}>Flexible</option>
+                <option value="mornings" {% if user.worker_profile and user.worker_profile.preferred_schedule.value == 'mornings' %}selected{% endif %}>Matins</option>
+                <option value="afternoons" {% if user.worker_profile and user.worker_profile.preferred_schedule.value == 'afternoons' %}selected{% endif %}>Après-midis</option>
+                <option value="evenings" {% if user.worker_profile and user.worker_profile.preferred_schedule.value == 'evenings' %}selected{% endif %}>Soirées</option>
+                <option value="weekends" {% if user.worker_profile and user.worker_profile.preferred_schedule.value == 'weekends' %}selected{% endif %}>Week-ends</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Présentation</label>
+            <textarea name="description" placeholder="Décrivez votre expérience, votre sérieux..." rows="5">{{ user.worker_profile.description if user.worker_profile else '' }}</textarea>
+        </div>
+        {% else %}
+        <div class="form-group">
+            <label>Adresse complète</label>
+            <textarea name="address" placeholder="Numéro de rue, quartier, ville..." rows="3">{{ user.employer_profile.address if user.employer_profile else '' }}</textarea>
+        </div>
+        <div class="form-group">
+            <label>Surface du logement (m²)</label>
+            <input type="number" name="square_footage" min="10" placeholder="Ex: 120" value="{{ user.employer_profile.square_footage if user.employer_profile else '' }}"/>
+        </div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary btn-full" style="margin-top: 1rem">Enregistrer mon profil</button>
+    </form>
+</div>
+{% endblock %}

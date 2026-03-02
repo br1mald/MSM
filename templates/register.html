@@ -1,0 +1,119 @@
+{% extends "layout.html" %} {% block main %}
+<div class="form-container" style="max-width: 580px">
+    <div class="form-title">Créer un compte</div>
+    <p class="form-sub">Rejoignez la communauté MénagePro</p>
+
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <div class="alert alert-error">{{ messages[0] }}</div>
+    {% endif %} {% endwith %}
+
+    <form method="POST">
+        <div style="margin-bottom: 1.5rem">
+            <label
+                style="font-weight: 500; display: block; margin-bottom: 0.8rem"
+                >Je suis :</label
+            >
+            <div class="role-selector">
+                <label class="role-card {% if request.args.get('role') == 'employer' %}active{% endif %}">
+                    <input type="radio" name="role" value="employer"
+                        {% if request.args.get('role') == 'employer' %}checked{% endif %} />
+                    <div class="icon">🏠</div>
+                    <strong>Particulier</strong>
+                    <p
+                        style="
+                            font-size: 0.8rem;
+                            color: #6b7280;
+                            margin-top: 0.3rem;
+                        "
+                    >
+                        Je cherche une aide
+                    </p>
+                </label>
+                <label class="role-card {% if request.args.get('role') ==  'worker' %}active{% endif %}" >
+                    <input type="radio" name="role" value="worker"
+                        {% if request.args.get('role') == 'worker' %}checked{% endif %} />
+                    <div class="icon">✨</div>
+                    <strong>Aide ménagère</strong>
+                    <p
+                        style="
+                            font-size: 0.8rem;
+                            color: #6b7280;
+                            margin-top: 0.3rem;
+                        "
+                    >
+                        Je propose mes services
+                    </p>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nom</label>
+                <input
+                    type="text"
+                    name="last_name"
+                    required
+                    value="{{ request.form.get('last_name', '') }}"
+                />
+            </div>
+            <div class="form-group">
+                <label>Prénom</label>
+                <input
+                    type="text"
+                    name="first_name"
+                    required
+                    value="{{ request.form.get('first_name', '') }}"
+                />
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input
+                type="email"
+                name="email"
+                required
+                value="{{ request.form.get('email', '') }}"
+            />
+        </div>
+        <div class="form-group">
+            <label>Téléphone</label>
+            <input
+                type="tel"
+                name="phone_number"
+                required
+                value="{{ request.form.get('phone_number', '') }}"
+            />
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" name="password" required />
+            </div>
+            <div class="form-group">
+                <label>Confirmer</label>
+                <input type="password" name="confirm" required />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">
+            Créer mon compte
+        </button>
+    </form>
+
+    <div class="divider">ou</div>
+    <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-full"
+        >J'ai déjà un compte</a
+    >
+</div>
+
+<script>
+    document.querySelectorAll(".role-card input").forEach((radio) => {
+        radio.addEventListener("change", () => {
+            document
+                .querySelectorAll(".role-card")
+                .forEach((c) => c.classList.remove("active"));
+            radio.closest(".role-card").classList.add("active");
+        });
+    });
+</script>
+{% endblock %}

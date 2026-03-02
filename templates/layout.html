@@ -1,19 +1,106 @@
 <!doctype html>
 <html lang="fr">
     <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Marketplace de Services Ménagers</title>
+        <meta charset="UTF-8" />
+        <title>MSM</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
         <link
             rel="stylesheet"
             href="{{ url_for('static', filename='style.css') }}"
         />
         <script
             defer
-            src=" {{ url_for('static', filename='script.js') }}"
+            src="{{ url_for('static', filename='script.js') }}"
         ></script>
     </head>
     <body>
-        {% block body %} {% endblock %}
+        <header>
+            <nav>
+                <a class="logo" href="/">MSM</a>
+
+                <button
+                    class="mobile-menu-btn"
+                    id="mobile-menu-btn"
+                    aria-label="Menu"
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <div class="menu-overlay" id="menu-overlay"></div>
+
+                <div class="nav-links">
+                    <a href="{{ url_for('main.search') }}">Trouver une aide</a>
+                    {% if session.get('user_id') %}
+                    <a href="{{ url_for('user.profile') }}"> Profil </a>
+                    <a
+                        id="btn-primary"
+                        class="btn btn-sm"
+                        href="{{ url_for('auth.logout') }}"
+                        >Déconnexion</a
+                    >
+                    {% else %}
+                    <a href="{{ url_for('auth.login') }}">Connexion</a>
+                    <a
+                        id="btn-primary"
+                        class="btn btn-sm"
+                        href="{{ url_for('auth.register') }}"
+                        >S'inscrire</a
+                    >
+                    {% endif %}
+                </div>
+            </nav>
+        </header>
+        <main class="main-wrapper">{% block main %} {% endblock %}</main>
+        <footer>
+            <p>
+                © 2026 MSM — La plateforme de confiance pour les services
+                ménagers
+            </p>
+            <p style="margin-top: 0.5rem">
+                UCAD · ESP · DGI · Licence 2 Genie Logiciel et Systèmes
+                d'informations
+            </p>
+        </footer>
+
+        <script>
+            // Mobile menu toggle
+            const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+            const navLinks = document.querySelector(".nav-links");
+            const menuOverlay = document.getElementById("menu-overlay");
+
+            function toggleMenu() {
+                navLinks.classList.toggle("active");
+                mobileMenuBtn.classList.toggle("active");
+                menuOverlay.classList.toggle("active");
+
+                // Prevent body scroll when menu is open
+                if (navLinks.classList.contains("active")) {
+                    document.body.style.overflow = "hidden";
+                } else {
+                    document.body.style.overflow = "";
+                }
+            }
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener("click", toggleMenu);
+            }
+
+            if (menuOverlay) {
+                menuOverlay.addEventListener("click", toggleMenu);
+            }
+
+            // Close menu when clicking nav links
+            const navLinksItems = navLinks.querySelectorAll("a");
+            navLinksItems.forEach((link) => {
+                link.addEventListener("click", () => {
+                    if (navLinks.classList.contains("active")) {
+                        toggleMenu();
+                    }
+                });
+            });
+        </script>
     </body>
 </html>

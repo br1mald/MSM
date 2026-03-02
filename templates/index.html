@@ -1,3 +1,113 @@
-{% extends "layout.html" %} {% block body %}
-<!--contenu de la page-->
-{% endblock %}
+{% extends "layout.html" %} {% block main %}
+
+<section class="hero">
+    <h1>Trouvez une aide ménagère<br />de confiance près de chez vous</h1>
+    <p>
+        Des professionnelles vérifiées, des documents contrôlés, une réservation
+        sécurisée en quelques clics.
+    </p>
+    <div class="hero-btns">
+        <a class="btn btn-accent" href="{{ url_for('main.search') }}"
+            >Trouver une aide</a
+        >
+        <a
+            class="btn btn-outline"
+            style="color: white; border-color: white"
+            href="{{ url_for('auth.register', role='worker') }}"
+            >Je suis une aide ménagère</a
+        >
+    </div>
+</section>
+
+<div class="section">
+    <h2 class="section-title centered">Comment ça marche ?</h2>
+    <p class="section-sub centered">Simple, rapide et sécurisé</p>
+
+    <div class="steps">
+        <div class="step">
+            <div class="step-num">1</div>
+            <h3>Créez votre compte</h3>
+            <p>
+                Inscription en quelques minutes, vérification de vos documents
+            </p>
+        </div>
+
+        <div class="step">
+            <div class="step-num">2</div>
+            <h3>Parcourez les profils</h3>
+            <p>Filtrez par compétences, disponibilité et note</p>
+        </div>
+
+        <div class="step">
+            <div class="step-num">3</div>
+            <h3>Réservez en sécurité</h3>
+            <p>Paiement de 10 000 F pour confirmer votre réservation</p>
+        </div>
+
+        <div class="step">
+            <div class="step-num">4</div>
+            <h3>Notez le service</h3>
+            <p>Laissez un avis après le service pour la communauté</p>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2 class="section-title">Nos meilleures aides ménagères</h2>
+    <p class="section-sub">Vérifiées et approuvées par notre équipe</p>
+
+    <div class="cards-grid">
+        {% for worker in best_workers %}
+        <a
+            href="/book/{{worker.id}}"
+            style="text-decoration: none; color: black"
+        >
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-avatar">
+                        {{ worker.user.first_name[0] }}
+                    </div>
+                    <div>
+                        <div class="card-name">
+                            {{ worker.user.first_name }} {{
+                            worker.user.last_name }}
+                        </div>
+                        <div class="card-sub">
+                            {{ worker.desired_salary }} F CFA/mois
+                        </div>
+                    </div>
+                </div>
+
+                <span class="stars">
+                    {{ (worker.average_rating | int) * '★' }}{{(5 -
+                    worker.average_rating | int) * '☆'}}
+                    ({{worker.rating_count}} avis)</span
+                >
+
+                <p
+                    style="
+                        margin: 0.8rem 0;
+                        font-size: 0.9rem;
+                        color: var(--gray);
+                    "
+                >
+                    {{ worker.description[:100] if worker.description else ''
+                    }}...
+                </p>
+
+                <div class="tags">
+                    {% for competence in worker.competences %}
+                    <span class="tag">{{ competence }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    <div style="text-align: center; margin-top: 1.5rem">
+        <a href="{{ url_for('main.search') }}" class="btn btn-outline"
+            >Voir tous les profils</a
+        >
+    </div>
+    {% endblock %}
+</div>

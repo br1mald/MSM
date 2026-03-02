@@ -1,0 +1,210 @@
+{% extends "layout.html" %} {% block main %}
+<div
+    class="dashboard-content"
+    style="padding: 2rem; max-width: 1000px; margin: 0 auto; overflow-x: hidden"
+>
+    <h2 class="section-title">Bonjour, {{ user.first_name }} 👋</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div
+        class="alert alert-{{ 'success' if category == 'success' else 'error' }}"
+    >
+        {{ message }}
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <h3 style="margin: 2rem 0 1rem; font-size: 1.2rem">Mes emplois</h3>
+
+    <div
+        class="table-wrapper"
+        style="
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-left: -1rem;
+            margin-right: -1rem;
+            padding: 0 1rem;
+        "
+    >
+        <table style="min-width: 800px; width: 100%">
+            <thead>
+                <tr>
+                    <th>Aide ménagère</th>
+                    <th>Date début</th>
+                    <th>Salaire</th>
+                    <th>Statut</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if not employments %}
+                <tr>
+                    <td
+                        colspan="5"
+                        style="
+                            text-align: center;
+                            color: var(--gray);
+                            padding: 2rem;
+                        "
+                    >
+                        Aucun emploi pour le moment.
+                    </td>
+                </tr>
+                {% endif %} {% for employment in employments %}
+                <tr>
+                    <td>
+                        <strong
+                            >{{ employment.worker.user.first_name }} {{
+                            employment.worker.user.last_name[0] }}.</strong
+                        >
+                    </td>
+                    <td>{{ employment.start_date.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ "{:,}".format(employment.salary) }} F</td>
+                    <td>
+                        {% if employment.status.value == 'active' %}
+                        <span class="badge badge-green">✓ Actif</span>
+                        {% elif employment.status.value == 'completed' %}
+                        <span class="badge badge-green">🏁 Terminé</span>
+                        {% elif employment.status.value == 'cancelled' %}
+                        <span class="badge badge-red">Annulé</span>
+                        {% else %}
+                        <span class="badge badge-yellow">⏳ En attente</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% set has_review = employment.reviews |
+                        selectattr('reviewer_id', 'equalto', user.id) | list |
+                        length > 0 %} {% if employment.status.value in
+                        ['completed', 'active'] and not has_review %}
+                        <button
+                            onclick="openReviewModal({{ employment.id }})"
+                            class="btn btn-sm btn-accent"
+                        >
+                            ⭐ Donner un avis
+                        </button>
+                        {% elif has_review %}
+                        <span style="color: var(--primary); font-size: 0.85rem"
+                            >✓ Avis donné</span
+                        >
+                        {% endif %} {% if employment.status.value == 'pending'
+                        %}
+                        <form
+                            method="POST"
+                            action="{{ url_for('user.cancel_employment', employment_id=employment.id) }}"
+                            style="display: inline"
+                        >
+                            <button
+                                type="submit"
+                                class="btn btn-sm btn-danger"
+                                onclick="
+                                    return confirm(
+                                        'Êtes-vous sûr de vouloir annuler cet emploi ?',
+                                    );
+                                "
+                            >
+                                ❌ Annuler
+                            </button>
+                        </form>
+                        {% endif %} {% if employment.status.value == 'cancelled'
+                        %}
+                        <span style="color: var(--gray); font-size: 0.85rem"
+                            >—</span
+                        >
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 2rem">
+        <a href="{{ url_for('main.search') }}" class="btn btn-primary"
+            >+ Nouvel emploi</a
+        >
+    </div>
+</div>
+
+<div class="modal-overlay" id="reviewModal">
+    <div class="modal">
+        <div class="modal-title">Laisser un avis ⭐</div>
+        <form method="POST" id="reviewForm">
+            <input type="hidden" name="employment_id" id="reviewEmploymentId" />
+
+            <div class="form-group">
+                <label>Note</label>
+                <div
+                    style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem"
+                    id="starRating"
+                >
+                    {% for i in range(1, 6) %}
+                    <span
+                        onclick="setRating({{ i }})"
+                        style="font-size: 2rem; cursor: pointer; color: #d1d5db"
+                        id="star-{{ i }}"
+                        >★</span
+                    >
+                    {% endfor %}
+                </div>
+                <input
+                    type="hidden"
+                    name="rating"
+                    id="ratingInput"
+                    value="5"
+                    required
+                />
+            </div>
+
+            <div class="form-group">
+                <label>Commentaire</label>
+                <textarea
+                    name="comment"
+                    placeholder="Décrivez votre expérience..."
+                    rows="4"
+                ></textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem">
+                <button type="submit" class="btn btn-primary" style="flex: 1">
+                    Envoyer
+                </button>
+                <button
+                    type="button"
+                    onclick="closeReviewModal()"
+                    class="btn btn-outline"
+                >
+                    Annuler
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openReviewModal(employmentId) {
+        document.getElementById("reviewEmploymentId").value = employmentId;
+        document.getElementById("reviewForm").action =
+            `/employment/${employmentId}/review`;
+        document.getElementById("reviewModal").classList.add("active");
+        setRating(5);
+    }
+
+    function closeReviewModal() {
+        document.getElementById("reviewModal").classList.remove("active");
+    }
+
+    function setRating(rating) {
+        document.getElementById("ratingInput").value = rating;
+        for (let i = 1; i <= 5; i++) {
+            const star = document.getElementById("star-" + i);
+            star.style.color = i <= rating ? "var(--accent)" : "#D1D5DB";
+        }
+    }
+
+    document
+        .getElementById("reviewModal")
+        .addEventListener("click", function (e) {
+            if (e.target === this) closeReviewModal();
+        });
+</script>
+{% endblock %}

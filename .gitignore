@@ -4,7 +4,14 @@ __pycache__/
 build/
 dist/
 wheels/
+pyproject.toml
 *.egg-info
 
 # Virtual environments
 .venv
+
+# MD files
+AUTH_SETUP.md
+BOOKING_PAYMENT.md
+PROFILE_SETUP.md
+VERIFY_PROFILES.md

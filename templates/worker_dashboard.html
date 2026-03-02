@@ -1,0 +1,133 @@
+{% extends "layout.html" %} {% block main %}
+<div class="dashboard-content" style="padding: 2rem; max-width: 1000px; margin: 0 auto; overflow-x: hidden;">
+    <h2 class="section-title">Bonjour, {{ user.first_name }} ✨</h2>
+
+    {% if user.status.value == 'pending' %}
+    <div class="alert alert-info">
+        ⏳ Votre profil est en cours de vérification. Vous serez notifié(e) dès
+        qu'il sera validé.
+    </div>
+    {% elif user.status.value == 'validated' %}
+    <div class="alert alert-success">
+        ✅ Votre profil est actif et visible par les particuliers.
+    </div>
+    {% elif user.status.value == 'suspended' %}
+    <div class="alert alert-error">
+        ⚠️ Votre compte est suspendu. Contactez le support.
+    </div>
+    {% endif %} {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %} {% for category, message in messages %}
+    <div
+        class="alert alert-{{ 'success' if category == 'success' else 'error' }}"
+    >
+        {{ message }}
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <div class="stats-grid" style="margin: 1.5rem 0">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_employments }}</div>
+            <div class="stat-label">Emplois totaux</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">
+                {{ "%.1f"|format(worker.average_rating) }}⭐
+            </div>
+            <div class="stat-label">Note moyenne</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ worker.rating_count }}</div>
+            <div class="stat-label">Avis reçus</div>
+        </div>
+    </div>
+
+    <h3 style="margin-bottom: 1rem">Mes emplois</h3>
+    <div class="table-wrapper" style="margin-bottom: 2rem; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-left: -1rem; margin-right: -1rem; padding: 0 1rem;">
+        <table style="min-width: 600px; width: 100%">
+            <thead>
+                <tr>
+                    <th>Employeur</th>
+                    <th>Date début</th>
+                    <th>Salaire</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if not employments %}
+                <tr>
+                    <td
+                        colspan="4"
+                        style="text-align: center; color: var(--gray)"
+                    >
+                        Aucun emploi pour le moment.
+                    </td>
+                </tr>
+                {% endif %} {% for employment in employments %}
+                <tr>
+                    <td>
+                        <strong
+                            >{{ employment.employer.user.first_name }} {{
+                            employment.employer.user.last_name[0] }}.</strong
+                        >
+                    </td>
+                    <td>{{ employment.start_date.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ "{:,}".format(employment.salary) }} F</td>
+                    <td>
+                        {% if employment.status.value == 'active' %}
+                        <span class="badge badge-green">✓ Actif</span>
+                        {% elif employment.status.value == 'completed' %}
+                        <span class="badge badge-green">🏁 Terminé</span>
+                        {% elif employment.status.value == 'cancelled' %}
+                        <span class="badge badge-red">Annulé</span>
+                        {% else %}
+                        <span class="badge badge-yellow">⏳ En attente</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h3 style="margin-bottom: 1rem">Derniers avis reçus</h3>
+    {% if not recent_reviews %}
+    <p style="color: var(--gray)">Aucun avis pour le moment.</p>
+    {% endif %} {% for review in recent_reviews %}
+    <div class="card" style="margin-bottom: 1rem">
+        <div
+            style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            "
+        >
+            <strong
+                >{{ review.reviewer.first_name }} {{
+                review.reviewer.last_name[0] }}.</strong
+            >
+            <span class="stars"
+                >{{ '★' * review.rating|int }}{{ '☆' * (5 - review.rating|int)
+                }}</span
+            >
+        </div>
+        {% if review.comment %}
+        <p style="margin-top: 0.5rem; color: var(--gray); font-size: 0.9rem">
+            {{ review.comment }}
+        </p>
+        {% endif %}
+        <small style="color: var(--gray)"
+            >{{ review.created_at.strftime('%d/%m/%Y') }}</small
+        >
+    </div>
+    {% endfor %}
+
+    <a
+        href="{{ url_for('user.complete_profile') }}"
+        class="btn btn-outline"
+        style="margin-top: 1rem"
+    >
+        ✏️ Modifier mon profil
+    </a>
+</div>
+</div>
+{% endblock %}

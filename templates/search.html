@@ -1,0 +1,76 @@
+{% extends "layout.html" %} {% block main %}
+<div class="section">
+    <h2 class="section-title">Trouver une aide ménagère</h2>
+    <p class="section-sub">Toutes nos aides sont vérifiées et validées</p>
+
+    <form method="GET" class="search-bar">
+        {{ form.hidden_tag() }} {{ form.competence(placeholder="🔍 Compétence
+        (ex: Repassage)") }} {{ form.dispo() }} {{ form.note_min() }} {{
+        form.submit(class="btn btn-primary") }}
+    </form>
+
+    <div class="cards-grid">
+        {% if not workers %}
+        <p style="grid-column: 1/-1; text-align: center; color: var(--gray)">
+            Aucun profil trouvé avec ces critères.
+        </p>
+        {% endif %} {% for user, worker in workers %}
+        <div class="card">
+            <div class="card-header">
+                <div class="card-avatar">{{ user.first_name[0]|upper }}</div>
+                <div>
+                    <div class="card-name">
+                        {{ user.first_name }} {{ user.last_name[0]|upper }}.
+                    </div>
+                    <div class="card-sub">
+                        {{ worker.preferred_schedule | schedule_display }}
+                    </div>
+                </div>
+                <div style="margin-left: auto">
+                    <span class="badge badge-green">Vérifié ✓</span>
+                </div>
+            </div>
+
+            <span class="stars"
+                >{{ '★' * worker.average_rating|int }}{{(5 -
+                worker.average_rating | int) * '☆'}}</span
+            >
+            <small style="color: var(--gray)"
+                >({{ worker.rating_count }} avis)</small
+            >
+
+            <p style="margin: 0.8rem 0; font-size: 0.9rem; color: var(--gray)">
+                {{ worker.description[:100] if worker.description else '' }}...
+            </p>
+
+            <div class="tags">
+                {% for competence in worker.competences %}
+                <span class="tag">{{ competence }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="card-salary-book">
+                <strong style="color: var(--primary)"
+                    >{{ "{:,}".format(worker.desired_salary) }} F/mois</strong
+                >
+
+                {% if session.get('user_id') and session.get('role') ==
+                'employer' %}
+                <a
+                    href="{{ url_for('user.book_worker', worker_id=worker.id) }}"
+                    class="btn btn-primary btn-sm"
+                    >Réserver</a
+                >
+                {% elif not session.get('user_id') %}
+                <a
+                    href="{{ url_for('auth.login') }}"
+                    class="btn btn-outline btn-sm"
+                    >Connexion pour réserver</a
+                >
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

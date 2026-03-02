@@ -1,0 +1,159 @@
+{% extends "layout.html" %} {% block main %}
+<div class="section" style="max-width: 500px">
+    <h2 class="section-title">💳 Paiement sécurisé</h2>
+
+    <div class="card" style="margin-bottom: 1.5rem">
+        <h3>Récapitulatif</h3>
+        <div style="margin-top: 1rem; color: var(--gray)">
+            <p>
+                Aide ménagère :
+                <strong style="color: var(--dark)"
+                    >{{ employment.worker.user.first_name }} {{
+                    employment.worker.user.last_name }}</strong
+                >
+            </p>
+            <p>
+                Date de début :
+                <strong style="color: var(--dark)"
+                    >{{ employment.start_date.strftime('%d/%m/%Y') }}</strong
+                >
+            </p>
+            <p>
+                Salaire :
+                <strong style="color: var(--dark)"
+                    >{{ "{:,}".format(employment.salary) }} F/mois</strong
+                >
+            </p>
+        </div>
+        <div
+            style="
+                border-top: 2px solid var(--border);
+                margin-top: 1rem;
+                padding-top: 1rem;
+                text-align: center;
+            "
+        >
+            <div
+                style="font-size: 2rem; font-weight: 700; color: var(--primary)"
+            >
+                10 000 F CFA
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-bottom: 1rem">Moyen de paiement</h3>
+        <div
+            style="
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 0.8rem;
+                margin-bottom: 1.5rem;
+            "
+        >
+            <label
+                id="lbl-orange"
+                style="
+                    border: 2px solid var(--primary);
+                    border-radius: 10px;
+                    padding: 1rem;
+                    text-align: center;
+                    cursor: pointer;
+                "
+            >
+                <input
+                    type="radio"
+                    name="payment"
+                    value="orange"
+                    style="display: none"
+                    checked
+                />
+                <div style="font-size: 1.5rem">🟠</div>
+                <small><strong>Orange Money</strong></small>
+            </label>
+            <label
+                id="lbl-wave"
+                style="
+                    border: 2px solid var(--border);
+                    border-radius: 10px;
+                    padding: 1rem;
+                    text-align: center;
+                    cursor: pointer;
+                "
+            >
+                <input
+                    type="radio"
+                    name="payment"
+                    value="wave"
+                    style="display: none"
+                />
+                <div style="font-size: 1.5rem">🔵</div>
+                <small><strong>Wave</strong></small>
+            </label>
+            <label
+                id="lbl-card"
+                style="
+                    border: 2px solid var(--border);
+                    border-radius: 10px;
+                    padding: 1rem;
+                    text-align: center;
+                    cursor: pointer;
+                "
+            >
+                <input
+                    type="radio"
+                    name="payment"
+                    value="card"
+                    style="display: none"
+                />
+                <div style="font-size: 1.5rem">💳</div>
+                <small><strong>Carte</strong></small>
+            </label>
+        </div>
+
+        <form method="POST">
+            <div class="form-group">
+                <label>Numéro de téléphone / carte</label>
+                <input
+                    type="text"
+                    name="phone_number"
+                    placeholder="7X XXX XX XX"
+                    required
+                />
+            </div>
+
+            <input
+                type="hidden"
+                name="payment_method"
+                id="payment_method"
+                value="orange"
+            />
+            <button type="submit" class="btn btn-primary btn-full">
+                ✓ Confirmer le paiement de 10 000 F
+            </button>
+        </form>
+        <p
+            style="
+                font-size: 0.8rem;
+                color: var(--gray);
+                text-align: center;
+                margin-top: 0.8rem;
+            "
+        >
+            🔒 Paiement 100% sécurisé
+        </p>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('input[name="payment"]').forEach((radio) => {
+        radio.addEventListener("change", () => {
+            document
+                .querySelectorAll('[id^="lbl-"]')
+                .forEach((l) => (l.style.borderColor = "var(--border)"));
+            radio.closest("label").style.borderColor = "var(--primary)";
+            document.getElementById("payment_method").value = radio.value;
+        });
+    });
+</script>
+{% endblock %}

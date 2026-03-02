@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
-# from sqlalchemy.orm import joinedload
-from models import Post, db
+from models import User, UserStatus, Worker, WorkerSearchForm, db
 
 # will need to import jsonify, request and maybe joinedload later, depending
 
@@ -11,25 +11,46 @@ main_bp = Blueprint("main", __name__)
 
 @main_bp.route("/")
 def index():
-    return render_template("index.html")
+
+    stmt = (
+        select(Worker)
+        .order_by(Worker.average_rating.desc())
+        .limit(3)
+        .options(joinedload(Worker.user))
+    )
+    best_workers = db.session.execute(stmt).scalars().all()
+
+    return render_template("index.html", best_workers=best_workers)
 
 
 @main_bp.route("/search")
 def search():
-    q = request.args.get("q")
-    if not q:
-        return "Query is needed", 400
+    form = WorkerSearchForm(request.args, meta={"csrf": False})
 
-    stmt = (
-        select(Post)
-        .where(Post.description.like(q) or Post.title.like(q))
-        .limit(20)
-        .order_by(Post.created_at.desc())
+    query = (
+        db.session.query(User, Worker)
+        .join(Worker, User.id == Worker.user_id)
+        .filter(User.status == UserStatus.VALIDATED)
     )
 
-    results = db.session.execute(stmt).scalars().all()
+    if form.competence.data:
+        query = query.filter(Worker.competences.contains(form.competence.data))
 
-    return render_template("search.html", results=results)
+    if form.dispo.data:
+        query = query.filter(Worker.preferred_schedule == form.dispo.data)
+
+    if form.note_min.data and form.note_min.data != "0":
+        note_min = int(form.note_min.data)
+        query = query.filter(Worker.average_rating >= note_min)
+
+    workers = query.order_by(Worker.average_rating.desc()).all()
+
+    return render_template(
+        "search.html",
+        form=form,
+        workers=workers,
+        page_title="Rechercher une aide ménagère",
+    )
 
 
 @main_bp.route("/log-in")
